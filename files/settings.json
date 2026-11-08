@@ -8,8 +8,7 @@
     "session-start-hook": "off",
     "anthropic-skills:chrome-browser": "off",
     "anthropic-skills:morning": "off",
-    "anthropic-skills:import-memory": "off",
-    "lemo-opuscar:lemo-opuscar": "off"
+    "anthropic-skills:import-memory": "off"
   },
   "hooks": {
     "SessionStart": [
