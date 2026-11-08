@@ -21,6 +21,7 @@ exe = shutil.which("skillspector") or str(C.parent / ".local/bin/skillspector")
 alerts = []
 for md in sorted((C / "skills").rglob("SKILL.md")):
     d = md.parent
+    if ".trash" in md.parts: continue  # deleted skills (moved to trash), not active
     if official(d): continue  # official Anthropic skills synced from claude.ai
     h = digest(d)
     if db.get(d.name) == h: continue
