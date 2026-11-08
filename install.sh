@@ -2,7 +2,7 @@
 # Instala a configuração do Claude Code numa sessão da nuvem.
 cd "$(dirname "$0")"
 C=/root/.claude
-mkdir -p $C/skills $C/hooks $C/output-styles
+mkdir -p $C/skills $C/hooks $C/output-styles $C/agents
 
 # 1. SkillSpector + skill skill-inspector
 rm -rf /opt/SkillSpector
@@ -17,6 +17,7 @@ cp files/hooks/skill-guard.py $C/hooks/
 cp files/CLAUDE.md $C/CLAUDE.md
 cp files/settings.json $C/settings.json
 cp files/output-styles/*.md $C/output-styles/
+cp files/agents/*.md $C/agents/
 [ -f $C/skill-guard.json ] || cp files/skill-guard.json $C/skill-guard.json
 
 # 3. Mods (plugins)
