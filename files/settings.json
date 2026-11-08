@@ -1,0 +1,40 @@
+{
+  "outputStyle": "Simples PT",
+  "skillOverrides": {
+    "keybindings-help": "off",
+    "fewer-permission-prompts": "off",
+    "plugin-authoring": "off",
+    "startup-hook-skill": "off",
+    "session-start-hook": "off",
+    "anthropic-skills:chrome-browser": "off",
+    "anthropic-skills:morning": "off",
+    "anthropic-skills:import-memory": "off"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/skill-guard.py",
+            "asyncRewake": true,
+            "timeout": 1800
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/skill-guard.py",
+            "asyncRewake": true,
+            "timeout": 1800
+          }
+        ]
+      }
+    ]
+  }
+}
