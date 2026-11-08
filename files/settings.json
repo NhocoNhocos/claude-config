@@ -36,5 +36,8 @@
         ]
       }
     ]
+  },
+  "env": {
+    "PONYTAIL_DEFAULT_MODE": "off"
   }
 }

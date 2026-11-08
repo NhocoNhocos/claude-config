@@ -24,5 +24,6 @@ CL=/opt/node22/bin/claude
 if [ -x $CL ]; then (cd /root
   $CL plugin marketplace add robonuggets/ribbon && $CL plugin install ribbon@robonuggets --scope user
   $CL plugin marketplace add johnnyvizz/claude-kit && $CL plugin install savvy-progress@claude-kit --scope user && $CL plugin install savvy-flow@claude-kit --scope user
+  $CL plugin marketplace add DietrichGebert/ponytail && $CL plugin install ponytail@ponytail --scope user
 ) || echo "mods install failed"; fi
 exit 0
