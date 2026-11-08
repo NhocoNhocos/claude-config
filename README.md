@@ -12,3 +12,7 @@ A minha configuração do Claude Code para as sessões da nuvem.
 | `files/output-styles/simples-pt.md` | Estilo de resposta em português, curto e simples |
 
 Para mudar algo: edita o ficheiro, faz commit e push. A próxima sessão nova já usa a versão nova.
+
+## Atenção: cache da nuvem
+A nuvem guarda uma "fotografia" do arranque e só volta a correr o script quando ele muda.
+Depois de cada push, sobe o número `# claude-config vN` no script do ambiente Default.
