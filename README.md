@@ -10,6 +10,7 @@ A minha configuração do Claude Code para as sessões da nuvem.
 | `files/hooks/skill-guard.py` | Analisa automaticamente cada skill nova com o SkillSpector |
 | `files/skill-guard.json` | Skills já analisadas (ponto de partida) |
 | `files/output-styles/simples-pt.md` | Estilo de resposta em português, curto e simples |
+| `files/agents/quick-fixer.md` | Ajudante barato (Haiku) para gralhas e edições pequenas; só se usa quando pedes |
 
 Para mudar algo: edita o ficheiro, faz commit e push. A próxima sessão nova já usa a versão nova.
 
