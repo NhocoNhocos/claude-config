@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile
+import hashlib, json, os, pathlib, shutil, subprocess, sys
 C = pathlib.Path.home() / ".claude"
 DB = C / "skill-guard.json"
 try: db = json.loads(DB.read_text())
@@ -17,7 +17,7 @@ def official(d):
         return src.get(d.name) in ("anthropic", "anthropic-example")
     except Exception:
         return False
-exe = shutil.which("skillspector") or str(C.parent / ".local/bin/skillspector")
+exe = shutil.which("skillspector") or str(C.parent / ".local/bin" / ("skillspector.exe" if os.name == "nt" else "skillspector"))
 alerts = []
 for md in sorted((C / "skills").rglob("SKILL.md")):
     d = md.parent
@@ -25,15 +25,19 @@ for md in sorted((C / "skills").rglob("SKILL.md")):
     if official(d): continue  # official Anthropic skills synced from claude.ai
     h = digest(d)
     if db.get(d.name) == h: continue
-    fd, out = tempfile.mkstemp(suffix=".json"); os.close(fd)  # mkstemp: also works on Windows
+    # Read the report from stdout: on Windows SkillSpector refuses --output ("Safe file output is unsupported")
     try:
-        subprocess.run([exe, "scan", str(d), "--no-llm", "--format", "json", "--output", out],
-                       capture_output=True, timeout=300)
-        r = json.loads(pathlib.Path(out).read_text(encoding="utf-8"))
+        p = subprocess.run([exe, "scan", str(d), "--no-llm", "--format", "json"],
+                           capture_output=True, timeout=300, text=True, encoding="utf-8", errors="replace")
+        out = p.stdout.strip()
+        r = json.loads(out[out.find("{"):]) if "{" in out else None
+        if not isinstance(r, dict):
+            err = (p.stderr or "sem resultado").strip()[:200]
+            if "trampoline" in err and "WindowsApps" in sys.executable:
+                err += " - o hook corre com o Python da Microsoft Store, que nao ve %APPDATA%\\uv; volta a correr o install.ps1"
+            raise ValueError(err)
     except Exception as e:
         alerts.append(f"- {d.name} ({d}): scan falhou ({e}); rever manualmente"); continue
-    finally:
-        os.remove(out)
     ra = r.get("risk_assessment", {})
     hi = [f"{i['id']} {i['location']['file']}:{i['location'].get('start_line')}"
           for i in r.get("issues", []) if i.get("severity") in ("HIGH", "CRITICAL")]

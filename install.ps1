@@ -10,7 +10,8 @@ $S = Join-Path $env:TEMP "SkillSpector"
 if (Test-Path $S) { Remove-Item -Recurse -Force $S }
 git clone -q --depth 1 https://github.com/NVIDIA/SkillSpector.git $S
 if ($LASTEXITCODE -eq 0) {
-  uv tool install --force $S
+  # --python 3.12: o yara-python (dependência) ainda não tem versão pronta para Python 3.14
+  uv tool install --force --python 3.12 $S
   if ($LASTEXITCODE -ne 0) { Write-Warning "skillspector install failed" }
   $SI = Join-Path $C "skills\skill-inspector"
   if (Test-Path $SI) { Remove-Item -Recurse -Force $SI }
@@ -24,11 +25,20 @@ Copy-Item files\output-styles\*.md (Join-Path $C "output-styles") -Force
 Copy-Item files\agents\*.md (Join-Path $C "agents") -Force
 if (-not (Test-Path (Join-Path $C "skill-guard.json"))) { Copy-Item files\skill-guard.json $C }
 # settings.json: no Windows o Python costuma chamar-se "python" e não "python3"
-$py = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" } else { "python" }
+# Evita o atalho da Microsoft Store (WindowsApps\python.exe): corre como app empacotada e não vê
+# %APPDATA%\uv, por isso o skillspector falha com "uv trampoline failed to canonicalize script path".
+$py = (Get-Command python3, python -All -ErrorAction SilentlyContinue |
+       Where-Object { $_.Source -notmatch '\\WindowsApps\\' } | Select-Object -First 1).Source
+if (-not $py) { $py = "python" }
+$pyCmd = '\"' + ($py -replace '\\', '/') + '\"'  # caminho entre aspas (escapadas para JSON), com / para o Git Bash
 $Set = Join-Path $C "settings.json"
 if (Test-Path $Set) { Copy-Item $Set "$Set.bak" -Force; Write-Host "settings.json antigo guardado em settings.json.bak" }
-$json = (Get-Content files\settings.json -Raw -Encoding UTF8) -replace "python3 ", "$py "
-[IO.File]::WriteAllText($Set, $json, (New-Object Text.UTF8Encoding $false))  # UTF-8 sem BOM
+$json = (Get-Content files\settings.json -Raw -Encoding UTF8) -replace "python3 ", "$pyCmd "
+# Junta ao settings.json existente (mantém enabledPlugins, marketplaces, etc.) em vez de o substituir
+$tmp = Join-Path $env:TEMP "claude-settings-new.json"
+[IO.File]::WriteAllText($tmp, $json, (New-Object Text.UTF8Encoding $false))
+& $py -I -c "import json,os,sys; s,n=sys.argv[1],sys.argv[2]; c=json.load(open(s,encoding='utf-8')) if os.path.exists(s) else {}; c.update(json.load(open(n,encoding='utf-8'))); open(s,'w',encoding='utf-8').write(json.dumps(c,indent=2,ensure_ascii=False)+'\n')" $Set $tmp
+Remove-Item $tmp
 
 # 3. Mods (plugins)
 if (Get-Command claude -ErrorAction SilentlyContinue) {
