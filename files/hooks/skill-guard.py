@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import hashlib, json, pathlib, shutil, subprocess, sys, tempfile
+import hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile
 C = pathlib.Path.home() / ".claude"
 DB = C / "skill-guard.json"
 try: db = json.loads(DB.read_text())
@@ -25,13 +25,15 @@ for md in sorted((C / "skills").rglob("SKILL.md")):
     if official(d): continue  # official Anthropic skills synced from claude.ai
     h = digest(d)
     if db.get(d.name) == h: continue
-    with tempfile.NamedTemporaryFile(suffix=".json") as out:
-        try:
-            subprocess.run([exe, "scan", str(d), "--no-llm", "--format", "json", "--output", out.name],
-                           capture_output=True, timeout=300)
-            r = json.load(open(out.name))
-        except Exception as e:
-            alerts.append(f"- {d.name} ({d}): scan falhou ({e}); rever manualmente"); continue
+    fd, out = tempfile.mkstemp(suffix=".json"); os.close(fd)  # mkstemp: also works on Windows
+    try:
+        subprocess.run([exe, "scan", str(d), "--no-llm", "--format", "json", "--output", out],
+                       capture_output=True, timeout=300)
+        r = json.loads(pathlib.Path(out).read_text(encoding="utf-8"))
+    except Exception as e:
+        alerts.append(f"- {d.name} ({d}): scan falhou ({e}); rever manualmente"); continue
+    finally:
+        os.remove(out)
     ra = r.get("risk_assessment", {})
     hi = [f"{i['id']} {i['location']['file']}:{i['location'].get('start_line')}"
           for i in r.get("issues", []) if i.get("severity") in ("HIGH", "CRITICAL")]
