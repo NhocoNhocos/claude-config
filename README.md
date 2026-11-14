@@ -12,6 +12,7 @@ A minha configuração do Claude Code para as sessões da nuvem.
 | `files/skill-guard.json` | Skills já analisadas (ponto de partida) |
 | `files/output-styles/simples-pt.md` | Estilo de resposta em português, curto e simples |
 | `files/agents/quick-fixer.md` | Ajudante barato (Haiku) para gralhas e edições pequenas; só se usa quando pedes |
+| `files/skills/limpeza/SKILL.md` | Comando `/limpeza`: lista e arruma skills, plugins e agentes, só com a tua autorização |
 
 Para mudar algo: edita o ficheiro, faz commit e push. A próxima sessão nova já usa a versão nova.
 

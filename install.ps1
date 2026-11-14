@@ -23,6 +23,7 @@ Copy-Item files\hooks\skill-guard.py (Join-Path $C "hooks") -Force
 Copy-Item files\CLAUDE.md (Join-Path $C "CLAUDE.md") -Force
 Copy-Item files\output-styles\*.md (Join-Path $C "output-styles") -Force
 Copy-Item files\agents\*.md (Join-Path $C "agents") -Force
+Copy-Item files\skills\* (Join-Path $C "skills") -Recurse -Force
 if (-not (Test-Path (Join-Path $C "skill-guard.json"))) { Copy-Item files\skill-guard.json $C }
 # settings.json: no Windows o Python costuma chamar-se "python" e não "python3"
 # Evita o atalho da Microsoft Store (WindowsApps\python.exe): corre como app empacotada e não vê

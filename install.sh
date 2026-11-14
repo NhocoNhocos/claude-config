@@ -18,6 +18,7 @@ cp files/CLAUDE.md $C/CLAUDE.md
 cp files/settings.json $C/settings.json
 cp files/output-styles/*.md $C/output-styles/
 cp files/agents/*.md $C/agents/
+cp -r files/skills/* $C/skills/
 [ -f $C/skill-guard.json ] || cp files/skill-guard.json $C/skill-guard.json
 
 # 3. Mods (plugins)
